@@ -1,0 +1,160 @@
+SQL> select * from cat;
+
+TABLE_NAME   TABLE_TYPE                                                         
+------------ -----------                                                        
+DEPT         TABLE                                                              
+EMPLOYEE     TABLE                                                              
+EXPENSE      TABLE                                                              
+TRIP         TABLE                                                              
+
+SQL> desc dept;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ CODE                                      NOT NULL CHAR(5)
+ NAME                                      NOT NULL CHAR(10)
+ PHONE                                     NOT NULL CHAR(8)
+ CONTACT                                            CHAR(15)
+
+SQL> desc employee;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ ID                                        NOT NULL NUMBER(38)
+ NAME                                      NOT NULL CHAR(15)
+ DEPT                                      NOT NULL CHAR(5)
+ JOIN_DATE                                          DATE
+
+SQL> desc expense;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ TRIP_ID                                   NOT NULL NUMBER(38)
+ RECEIPT_NO                                NOT NULL NUMBER(38)
+ AMOUNT                                    NOT NULL NUMBER(6,2)
+ TYPE                                               CHAR(2)
+ SUBMITTED                                          DATE
+
+SQL> desc trip;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ ID                                        NOT NULL NUMBER(38)
+ EMP_ID                                             NUMBER(38)
+ TO_CITY                                            CHAR(15)
+ DEP_DATE                                  NOT NULL DATE
+ RETURN_DATE                               NOT NULL DATE
+ EST_COST                                  NOT NULL NUMBER(6,2)
+
+SQL> select a.owner, a.table_name, column_name primary_key,
+  2              a.constraint_name
+  3        from   user_cons_columns a, user_constraints b
+  4        where  a.constraint_name = b.constraint_name and
+  5               constraint_type = 'P';
+
+OWNER        TABLE_NAME   PRIMARY_KEY  CONSTRAINT_NAME                          
+------------ ------------ ------------ ------------------------------           
+DBCLASS20    DEPT         CODE         SYS_C008387                              
+DBCLASS20    EMPLOYEE     ID           SYS_C008390                              
+DBCLASS20    EXPENSE      TRIP_ID      SYS_C008414                              
+DBCLASS20    EXPENSE      RECEIPT_NO   SYS_C008414                              
+DBCLASS20    TRIP         ID           SYS_C008409                              
+
+SQL>       select a.owner, a.table_name, a.column_name foreign_key,
+  2               b.table_name Referring_table, b.column_name
+  3               Primary_key
+  4        from   user_cons_columns a, user_cons_columns b,
+  5               user_constraints c
+  6        where  a.constraint_name = c.constraint_name and
+  7               c.r_constraint_name = b.constraint_name;
+
+OWNER        TABLE_NAME   FOREIGN_KEY  REFERRING_TABLE PRIMARY_KEY              
+------------ ------------ ------------ --------------- ------------             
+DBCLASS20    EMPLOYEE     DEPT         DEPT            CODE                     
+DBCLASS20    TRIP         EMP_ID       EMPLOYEE        ID                       
+DBCLASS20    EXPENSE      TRIP_ID      TRIP            ID                       
+
+SQL>         select owner, table_name, search_condition from
+  2          user_constraints where search_condition is not null;
+
+OWNER        TABLE_NAME   SEARCH_CONDITION                                      
+------------ ------------ ---------------------------------------------         
+DBCLASS20    TRIP         "EST_COST" IS NOT NULL                                
+DBCLASS20    TRIP         Est_Cost >= 1.00 AND Est_Cost <= 4000.00              
+DBCLASS20    EXPENSE      Type IN ('T', 'H', 'M')                               
+DBCLASS20    EXPENSE      Amount >= 1.00                                        
+DBCLASS20    EXPENSE      "AMOUNT" IS NOT NULL                                  
+DBCLASS20    TRIP         "RETURN_DATE" IS NOT NULL                             
+DBCLASS20    TRIP         "DEP_DATE" IS NOT NULL                                
+DBCLASS20    DEPT         "NAME" IS NOT NULL                                    
+DBCLASS20    EMPLOYEE     "DEPT" IS NOT NULL                                    
+DBCLASS20    EMPLOYEE     "NAME" IS NOT NULL                                    
+DBCLASS20    DEPT         "PHONE" IS NOT NULL                                   
+
+11 rows selected.
+
+SQL> select * from employee;
+
+        ID NAME            DEPT  JOIN_DATE                                      
+---------- --------------- ----- ---------                                      
+         1 WILLIAM AFTON   FIN   09-JUL-19                                      
+         2 ROCK JOHNSON    SALE  08-MAR-15                                      
+         3 LUIGI MARIO     ENG   12-SEP-18                                      
+         4 GEORGE YOUNG    RD    24-OCT-09                                      
+         5 TIM HORTON      PRD   08-AUG-17                                      
+         6 BRODY FOX       PRD   11-NOV-13                                      
+         7 BOB BURGERS     SUPP  01-MAY-02                                      
+         8 BRIAN GRIFFIN   HR    17-DEC-10                                      
+         9 SPONGE BOB      FIN   14-SEP-01                                      
+        10 GREG HEFFLY     IT    18-FEB-22                                      
+
+10 rows selected.
+
+SQL> select * from dept;
+
+CODE  NAME       PHONE    CONTACT                                               
+----- ---------- -------- ---------------                                       
+IT    Info Tech  123-5678 Jim Smith                                             
+SALE  Sales      345-7890 Rick Harrison                                         
+MKTG  Marketing  456-7901 Tom Tucker                                            
+QA    QA Team    678-0123 Toby Fox                                              
+FIN   Finance    789-0124 Fin Human                                             
+SUPP  Support    890-1345 Freddy Fazbear                                        
+PRD   Production 901-3456 Markiplier                                            
+RD    Research   012-3467 Peter Griffin                                         
+HR    HR Dept    234-6789 Rick Sanchez                                          
+ENG   Engineer   567-8012 Bob Builder                                           
+
+10 rows selected.
+
+SQL> select * from trip;
+
+        ID     EMP_ID TO_CITY         DEP_DATE  RETURN_DA   EST_COST            
+---------- ---------- --------------- --------- --------- ----------            
+         1          1 New York        15-JAN-23 20-JAN-23        500            
+         2          2 Los Angeles     10-FEB-23 15-FEB-23        800            
+         3          3 Chicago         20-MAR-23 25-MAR-23        700            
+         4          4 San Francisco   05-APR-23 10-APR-23        900            
+         5          5 Seattle         15-MAY-23 20-MAY-23        750            
+         6          6 Miami           30-JUN-23 05-JUL-23       1100            
+         7          7 Boston          10-JUL-23 15-JUL-23        950            
+         8          8 Denver          25-AUG-23 30-AUG-23        850            
+         9          9 Phoenix         05-SEP-23 10-SEP-23        700            
+        10         10 Dallas          15-OCT-23 20-OCT-23        800            
+
+10 rows selected.
+
+SQL> select * from expense;
+
+   TRIP_ID RECEIPT_NO     AMOUNT TY SUBMITTED                                   
+---------- ---------- ---------- -- ---------                                   
+         1          1        100 T  01-JAN-23                                   
+         2          2      200.5 H  02-JAN-23                                   
+         3          3      50.75 M  03-JAN-23                                   
+         4          4      75.25 T  04-JAN-23                                   
+         5          5        150 H  05-JAN-23                                   
+         6          6       45.5 M  06-JAN-23                                   
+         7          7      90.75 T  07-JAN-23                                   
+         8          8        175 H  08-JAN-23                                   
+         9          9      60.25 M  09-JAN-23                                   
+        10         10      120.5 T  10-JAN-23                                   
+
+10 rows selected.
+
+SQL> spool off
